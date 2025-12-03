@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdotanteRepository {
-    private List<Adotante> adotantes = new ArrayList<>();
-
+    private static List<Adotante> adotantes = new ArrayList<>();
     public void salvar(Adotante adotante) {
         adotantes.add(adotante);
+    }
+
+    public List<Adotante> buscarTodos() {
+        return adotantes;
     }
 
     public Adotante buscarPorNome(String nome) {

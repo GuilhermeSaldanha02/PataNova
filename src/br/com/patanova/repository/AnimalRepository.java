@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AnimalRepository {
-    private List<Animal> animais = new ArrayList<>();
-
+    private static List<Animal> animais = new ArrayList<>();
     public void salvar(Animal animal) {
         animais.add(animal);
     }

@@ -12,8 +12,7 @@ public class AnimalService {
 
     public void cadastrarAnimal(Animal animal) {
         if (animal.getNome().isEmpty()) {
-            System.out.println("Erro: O animal precisa de um nome.");
-            return;
+            throw new IllegalArgumentException("O animal precisa de um nome.");
         }
         repository.salvar(animal);
         System.out.println("Service: " + animal.getNome() + " cadastrado com sucesso.");
@@ -22,8 +21,11 @@ public class AnimalService {
     public void disponibilizarParaAdocao(String nome) {
         Animal animal = repository.buscarPorNome(nome);
         if (animal == null) {
-            System.out.println("Erro: Animal não encontrado.");
-            return;
+            throw new IllegalArgumentException("Animal '" + nome + "' não encontrado no sistema.");
+        }
+
+        if (!animal.getStatus().equals("RESGATADO")) {
+            throw new IllegalArgumentException("O animal não pode ser disponibilizado. Status atual: " + animal.getStatus());
         }
         animal.disponibilizarParaAdocao();
     }
@@ -32,13 +34,15 @@ public class AnimalService {
         Animal animal = repository.buscarPorNome(nomeAnimal);
 
         if (animal == null) {
-            System.out.println("Erro: Animal não encontrado no sistema.");
-            return;
+            throw new IllegalArgumentException("Animal '" + nomeAnimal + "' não encontrado.");
         }
 
         if (adotante == null) {
-            System.out.println("Erro: Adotante inválido.");
-            return;
+            throw new IllegalArgumentException("Adotante não encontrado. Verifique o nome digitado.");
+        }
+
+        if (!animal.getStatus().equals("DISPONÍVEL")) {
+            throw new IllegalArgumentException("Este animal não está disponível para adoção (Status: " + animal.getStatus() + ").");
         }
 
         animal.finalizarAdocao();
