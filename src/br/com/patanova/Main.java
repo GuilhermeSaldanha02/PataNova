@@ -1,27 +1,26 @@
 package br.com.patanova;
 
-import br.com.patanova.model.Adotante;
+import br.com.patanova.controller.AdotanteController;
+import br.com.patanova.controller.AnimalController;
 import br.com.patanova.model.Animal;
 import br.com.patanova.model.Cachorro;
 import br.com.patanova.model.Gato;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static List<Animal> animais = new ArrayList<>();
-    private static List<Adotante> adotantes = new ArrayList<>();
+    private static AnimalController animalController = new AnimalController();
+    private static AdotanteController adotanteController = new AdotanteController();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcao = 0;
 
-        animais.add(new Cachorro("Rex", 3, "Grande"));
-        animais.add(new Gato("Mimi", 2, "Dócil"));
-        adotantes.add(new Adotante("Carlos", "123.456.789-00", "Rua A"));
+        animalController.cadastrar(new Cachorro("Rex", 3, "Grande"));
+        animalController.cadastrar(new Gato("Mimi", 2, "Dócil"));
+        adotanteController.cadastrar("Carlos", "123.456.789-00", "Rua A");
 
-        System.out.println("=== Sistema PataNova Iniciado ===");
+        System.out.println("=== Sistema PataNova (Arquitetura em Camadas) ===");
 
         while (opcao != 6) {
             System.out.println("\n1. Cadastrar Animal");
@@ -42,22 +41,30 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    cadastrarAnimal(scanner);
+                    viewCadastrarAnimal(scanner);
                     break;
                 case 2:
-                    cadastrarAdotante(scanner);
+                    viewCadastrarAdotante(scanner);
                     break;
                 case 3:
-                    mudarStatusAnimal(scanner);
+                    System.out.print("Nome do animal: ");
+                    animalController.disponibilizar(scanner.nextLine());
                     break;
                 case 4:
-                    realizarAdocao(scanner);
+                    System.out.print("Nome do Adotante: ");
+                    String nomeAdotante = scanner.nextLine();
+                    System.out.print("Nome do Animal: ");
+                    String nomeAnimal = scanner.nextLine();
+                    animalController.adotar(nomeAnimal, nomeAdotante);
                     break;
                 case 5:
-                    listarDisponiveis();
+                    System.out.println("\n--- Animais Disponíveis ---");
+                    for (Animal a : animalController.listarDisponiveis()) {
+                        a.exibirDetalhes();
+                    }
                     break;
                 case 6:
-                    System.out.println("Encerrando sistema...");
+                    System.out.println("Encerrando...");
                     break;
                 default:
                     System.out.println("Opção inválida!");
@@ -65,7 +72,7 @@ public class Main {
         }
     }
 
-    private static void cadastrarAnimal(Scanner scanner) {
+    private static void viewCadastrarAnimal(Scanner scanner) {
         System.out.print("Tipo (1-Cachorro, 2-Gato): ");
         int tipo = scanner.nextInt();
         scanner.nextLine();
@@ -78,74 +85,21 @@ public class Main {
         if (tipo == 1) {
             System.out.print("Porte: ");
             String porte = scanner.nextLine();
-            animais.add(new Cachorro(nome, idade, porte));
+            animalController.cadastrar(new Cachorro(nome, idade, porte));
         } else if (tipo == 2) {
             System.out.print("Temperamento: ");
             String temp = scanner.nextLine();
-            animais.add(new Gato(nome, idade, temp));
+            animalController.cadastrar(new Gato(nome, idade, temp));
         }
-        System.out.println("Animal cadastrado com sucesso!");
     }
 
-    private static void cadastrarAdotante(Scanner scanner) {
+    private static void viewCadastrarAdotante(Scanner scanner) {
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
         System.out.print("CPF: ");
         String cpf = scanner.nextLine();
         System.out.print("Endereço: ");
         String endereco = scanner.nextLine();
-        adotantes.add(new Adotante(nome, cpf, endereco));
-        System.out.println("Adotante cadastrado!");
-    }
-
-    private static void mudarStatusAnimal(Scanner scanner) {
-        System.out.print("Nome do animal para disponibilizar: ");
-        String nome = scanner.nextLine();
-        for (Animal a : animais) {
-            if (a.getNome().equalsIgnoreCase(nome)) {
-                a.disponibilizarParaAdocao();
-                return;
-            }
-        }
-        System.out.println("Animal não encontrado.");
-    }
-
-    private static void realizarAdocao(Scanner scanner) {
-        System.out.print("Nome do Adotante: ");
-        String nomeAdotante = scanner.nextLine();
-        Adotante adotante = null;
-        for (Adotante a : adotantes) {
-            if (a.getNome().equalsIgnoreCase(nomeAdotante)) {
-                adotante = a;
-                break;
-            }
-        }
-
-        if (adotante == null) {
-            System.out.println("Adotante não encontrado!");
-            return;
-        }
-
-        System.out.print("Nome do Animal: ");
-        String nomeAnimal = scanner.nextLine();
-        for (Animal a : animais) {
-            if (a.getNome().equalsIgnoreCase(nomeAnimal)) {
-                a.finalizarAdocao();
-                return;
-            }
-        }
-        System.out.println("Animal não encontrado.");
-    }
-
-    private static void listarDisponiveis() {
-        System.out.println("\n--- Animais Disponíveis ---");
-        boolean encontrou = false;
-        for (Animal a : animais) {
-            if (a.getStatus().equals("DISPONÍVEL")) {
-                a.exibirDetalhes();
-                encontrou = true;
-            }
-        }
-        if (!encontrou) System.out.println("Nenhum animal disponível no momento.");
+        adotanteController.cadastrar(nome, cpf, endereco);
     }
 }
